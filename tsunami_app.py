@@ -67,6 +67,28 @@ def visualizations():
     plt.savefig(os.path.join(BASE_DIR, img_path))
     plt.close()
     return render_template('visualizations.html', image=img_path)
+from sklearn.tree import export_graphviz
+import graphviz
+
+@app.route('/arbol.png')
+def generate_tree_image():
+    # Crear el archivo .dot desde el árbol de decisión
+    dot_data = export_graphviz(clf.estimators_[0], 
+                               out_file=None,
+                               feature_names=X.columns,
+                               class_names=clf.classes_,
+                               filled=True, rounded=True)
+    graph = graphviz.Source(dot_data)
+    img_path = os.path.join(BASE_DIR, 'static', 'arbol')
+    graph.format = 'png'
+    graph.render(img_path, cleanup=True)  # Guarda la imagen como PNG
+    
+    # Comprueba si el archivo se generó
+    if not os.path.exists(f"{img_path}.png"):
+        return jsonify({'error': 'No se pudo generar el árbol de decisión'}), 500
+    
+    # Devuelve la ruta de la imagen
+    return jsonify({'message': 'Árbol generado', 'image_path': '/static/arbol.png'})
 
 if __name__ == '__main__':
     app.run(debug=True)

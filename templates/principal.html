@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,12 +14,14 @@
             color: #eaeaea;
             font-family: 'Arial', sans-serif;
         }
+
         h1 {
             color: #4caf50;
             font-weight: bold;
             margin-top: 2rem;
             text-align: center;
         }
+
         form {
             background: linear-gradient(135deg, #4caf50 0%, #1a1a2e 100%);
             border-radius: 10px;
@@ -28,10 +31,12 @@
             max-width: 400px;
             float: left;
         }
+
         label {
             display: block;
             margin: 1rem 0;
         }
+
         input {
             width: 100%;
             border: none;
@@ -39,6 +44,7 @@
             border-radius: 5px;
             margin-top: 0.5rem;
         }
+
         button {
             background-color: #4caf50;
             border: none;
@@ -49,17 +55,21 @@
             cursor: pointer;
             transition: background-color 0.3s;
         }
+
         button:hover {
             background-color: #3e8e41;
         }
+
         #map {
-            width: calc(100% - 450px); /* Ajusta el tamaño según el espacio restante */
+            width: calc(100% - 450px);
+            /* Ajusta el tamaño según el espacio restante */
             height: 500px;
             margin: 2rem auto;
             float: right;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
+
         #result {
             margin-top: 2rem;
             padding: 1rem;
@@ -69,8 +79,71 @@
             font-size: 1.2rem;
             clear: both;
         }
+
+        .image-section img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        .image-section p {
+            font-size: 1rem;
+            color: #eaeaea;
+        }
+
+        .zoom {
+            cursor: zoom-in;
+            transition: transform 0.3s ease;
+        }
+
+        .zoom:hover {
+            transform: scale(1.05);
+            /* Efecto de agrandamiento en hover */
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        .modal-content {
+            position: absolute;
+            margin: auto;
+            display: block;
+            max-width: none;
+            max-height: none;
+            width: auto;
+            height: auto;
+            transform-origin: center;
+            cursor: grab;
+        }
+
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 25px;
+            color: rgb(255, 0, 0);
+            font-size: 35px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 5;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #bbb;
+            text-decoration: none;
+        }
     </style>
 </head>
+
 <body>
     <h1>Predicción de Tsunamis - JR48</h1>
     <form id="predict-form">
@@ -90,7 +163,15 @@
     </form>
     <div id="map"></div>
     <div id="result"></div>
-
+    <div class="tree-visualization mt-5">
+        <h2 class="text-center text-light">Visualización del Árbol de Decisión</h2>
+        <img src="/static/arbol.png" alt="Árbol de Decisión" class="img-fluid rounded shadow mt-3 zoom"
+            onclick="openModal(this.src)">
+    </div>
+    <div id="imageModal" class="modal">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
     <!-- Leaflet.js JavaScript -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
@@ -121,29 +202,137 @@
                 },
                 body: JSON.stringify(data)
             })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('result').innerText = `Nivel de riesgo: ${data.risk}, País: ${data.country}`;
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('result').innerText = `Nivel de riesgo: ${data.risk}, País: ${data.country}`;
 
-                const lng = parseFloat(document.querySelector('[name="longitude"]').value);
-                const lat = parseFloat(document.querySelector('[name="latitude"]').value);
+                    const lng = parseFloat(document.querySelector('[name="longitude"]').value);
+                    const lat = parseFloat(document.querySelector('[name="latitude"]').value);
 
-                // Crear o mover el marcador
-                if (marker) {
-                    marker.setLatLng([lat, lng]);
-                } else {
-                    marker = L.marker([lat, lng], {
-                        icon: L.icon({
-                            iconUrl: data.risk === 'Alto' ? 'https://cdn-icons-png.flaticon.com/512/565/565547.png' : 'https://cdn-icons-png.flaticon.com/512/189/189665.png',
-                            iconSize: [32, 32]
-                        })
-                    }).addTo(map);
-                }
+                    // Crear o mover el marcador
+                    if (marker) {
+                        marker.setLatLng([lat, lng]);
+                    } else {
+                        marker = L.marker([lat, lng], {
+                            icon: L.icon({
+                                iconUrl: data.risk === 'Alto' ? 'https://cdn-icons-png.flaticon.com/512/565/565547.png' : 'https://cdn-icons-png.flaticon.com/512/189/189665.png',
+                                iconSize: [32, 32]
+                            })
+                        }).addTo(map);
+                    }
 
-                // Centrar el mapa en las coordenadas
-                map.setView([lat, lng], 6);
-            });
+                    // Centrar el mapa en las coordenadas
+                    map.setView([lat, lng], 6);
+                });
         }
+
+        let scale = 0.01; // Escala inicial
+        let translateX = 0; // Posición horizontal
+        let translateY = 0; // Posición vertical
+        let isDragging = false; // Rastrea si el usuario está arrastrando
+        let startX, startY; // Posición inicial del clic
+
+        function openModal(imageSrc) {
+    const modal = document.getElementById('imageModal');
+    const modalImage = document.getElementById('modalImage');
+
+    // Muestra el modal
+    modal.style.display = "block";
+    modalImage.src = imageSrc;
+
+    // Esperar a que la imagen se cargue completamente antes de obtener sus dimensiones
+    modalImage.onload = function () {
+        // Obtener las dimensiones de la imagen y del modal
+        const imageWidth = modalImage.naturalWidth;
+        const imageHeight = modalImage.naturalHeight;
+        const modalWidth = modal.offsetWidth;
+        const modalHeight = modal.offsetHeight;
+
+        // Calcular las posiciones para centrar la imagen
+        const centerX = (modalWidth - imageWidth) / 2;
+        const centerY = (modalHeight - imageHeight) / 2;
+
+        // Establecer la transformación inicial para centrar la imagen
+        modalImage.style.transform = `scale(${scale}) translate(${centerX}px, ${centerY}px)`;
+        translateX = centerX; // Ajustamos la posición de inicio
+        translateY = centerY;
+    };
+
+    resetZoom(); // Restablecer el zoom y la posición
+}
+
+
+
+
+        function closeModal() {
+            const modal = document.getElementById('imageModal');
+            modal.style.display = "none";
+            resetZoom(); // Restablecer el estado del zoom al cerrar
+        }
+
+        function resetZoom() {
+            scale = 1;
+            translateX = 0;
+            translateY = 0;
+            const modalImage = document.getElementById('modalImage');
+            modalImage.style.transform = `scale(${scale}) translate(0, 0)`;
+        }
+
+        function zoomImage(event) {
+            event.preventDefault();
+            const modalImage = document.getElementById('modalImage');
+            const zoomStep = 0.05; // Reducción del incremento de zoom
+            const maxZoom = 3; // Límite superior
+            const minZoom = 0; // Límite inferior
+
+            if (event.deltaY < 0) {
+                scale = Math.min(maxZoom, scale + zoomStep); // Acercar
+            } else {
+                scale = Math.max(minZoom, scale - zoomStep); // Alejar
+            }
+
+            modalImage.style.transform = `scale(${scale}) translate(${translateX}px, ${translateY}px)`;
+        }
+
+        function startDrag(event) {
+            isDragging = true;
+            startX = event.clientX - translateX;
+            startY = event.clientY - translateY;
+            document.body.style.cursor = "grabbing";
+        }
+
+      function dragImage(event) {
+    if (!isDragging) return;
+    event.preventDefault();
+    
+    // Calcula la nueva posición sin desbordar fuera del modal
+    translateX = event.clientX - startX;
+    translateY = event.clientY - startY;
+
+    const modalImage = document.getElementById('modalImage');
+    modalImage.style.transform = `scale(${scale}) translate(${translateX}px, ${translateY}px)`;
+}
+
+
+        function stopDrag() {
+            isDragging = false;
+            document.body.style.cursor = "default";
+        }
+
+        // Event listeners para el zoom y el arrastre
+        const modalImage = document.getElementById('modalImage');
+        modalImage.addEventListener('wheel', zoomImage); // Zoom con el scroll
+        modalImage.addEventListener('mousedown', startDrag); // Comenzar arrastre
+        modalImage.addEventListener('mousemove', dragImage); // Mover imagen
+        modalImage.addEventListener('mouseup', stopDrag); // Detener arrastre
+        modalImage.addEventListener('mouseleave', stopDrag); // Detener si el cursor sale
+        document.querySelector('.close').addEventListener('click', closeModal); // Botón de cierre
+        document.getElementById('imageModal').addEventListener('click', (e) => {
+            if (e.target.id === 'imageModal') closeModal(); // Cerrar modal si se hace clic fuera de la imagen
+        });
     </script>
+
+
 </body>
+
 </html>
