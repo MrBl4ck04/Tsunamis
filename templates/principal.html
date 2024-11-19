@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Predicción de Tsunamis</title>
+</head>
+<body>
+    <h1>Predicción de Tsunamis</h1>
+    <form id="predict-form">
+        <label>Año: <input type="number" name="year"></label><br>
+        <label>Latitud: <input type="number" step="0.01" name="latitude"></label><br>
+        <label>Longitud: <input type="number" step="0.01" name="longitude"></label><br>
+        <label>Magnitud: <input type="number" step="0.1" name="magnitude"></label><br>
+        <button type="button" onclick="makePrediction()">Predecir</button>
+    </form>
+    <div id="result"></div>
+    <script>
+        function makePrediction() {
+            const data = {
+                data: [
+                    parseInt(document.querySelector('[name="year"]').value),
+                    parseFloat(document.querySelector('[name="latitude"]').value),
+                    parseFloat(document.querySelector('[name="longitude"]').value),
+                    parseFloat(document.querySelector('[name="magnitude"]').value)
+                ]
+            };
+            fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('result').innerText = `Nivel de riesgo: ${data.risk}, País: ${data.country}`;
+            });
+        }
+    </script>
+</body>
+</html>
