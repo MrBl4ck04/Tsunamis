@@ -6,40 +6,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contacto</title>
     <link rel="stylesheet" href="stylesContacto.css">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 
 </head>
 <body>
-        <nav class="navbar navbar-light fixed-top navbar-expand-lg">
-            <div class="container">
-                <a class="navbar-brand" href="#">ProtoCool OS</a>
-    
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarOpen">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-    
-                <div class="collapse navbar-collapse" id="navbarOpen">
-                    <ul class="navbar-nav ml-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" href="http://127.0.0.1:5000/">JR48</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/templates/cluster.html">Clustering</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/templates/redneuronal.html">Red Neuronal</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/templates/Contacto/indexContacto.html">Contacto</a>
-                        </li>
-                    </ul>
-                </div>
-    
-            </div>
-        </nav>
-    
+
     <div class="main">
+
+         <!-- Navbar -->
+         <div class="navbar">
+            <a href="#" class="logo">Tsunamis</a>
+            <!--
+            <div class="nav-links">
+                <span class="item selected">Home</span>
+            </div>
+            -->
+            <div class="nav-buttons" id="navMenu">
+                <a href="/index.html">
+                    <button class="nav-btn">Inicio</button>
+                </a>
+                <a class="nav-btn" href="http://127.0.0.1:5000/">JR48</a>
+                <a href="/templates/cluster.html">
+                    <button class="nav-btn">CLuster</button>
+                </a>
+                <a href="/templates/redneuronal.html">
+                    <button class="nav-btn">Red Neuronal</button>
+                </a>
+            </div>
+
+            <button class="toggler">
+                <i class='bx bx-menu'></i>
+            </button>
+        </div>
+        <!-- End of Navbar -->
+        <div class="get-started">
+            <p class="info-text1">Información sobre el equipo de desarrolladores:</p>
+        </div>
         <div class="container__cards">
 
         <div class="card">
@@ -126,7 +128,6 @@
     <div class="copyright">
         <p>Copyright 2024, ProtoCool OS</p>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js"></script>
+
 </body>
 </html>
