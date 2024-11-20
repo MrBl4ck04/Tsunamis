@@ -9,21 +9,73 @@
     <!-- Leaflet.js CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* Navbar */
+        .navbar-light .navbar-brand {
+            color: #fff !important;
+            font-size: 25px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            transition: color 0.3s ease;
+        }
+
+        .navbar-nav .nav-item .nav-link {
+            color: #fff !important;
+            transition: color 0.3s ease;
+        }
+
+        .navbar-nav .nav-item:hover .nav-link:hover {
+            color: #01393b !important;
+            transition: color 0.3s ease;
+        }
+
+        /* Navbar */
+        .navbar-light .navbar-brand:hover {
+            color: #01393b !important;
+            transition: color 0.3s ease;
+            font-size: 25px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .navbar-toggler {
+            background: #fff;
+            outline: none !important;
+            font-size: 18px;
+            line-height: 0.3;
+            padding: 1px 5px;
+        }
+
+        .navbar.scrolled {
+            background-color: rgba(3, 47, 58, 0.8); /* Fondo semi-transparente */
+            transition: background-color 0.3s ease;
+        }
+
         body {
-            background-color: #1a1a2e;
+            background-color: #099992;
             color: #eaeaea;
             font-family: 'Arial', sans-serif;
         }
 
         h1 {
-            color: #4caf50;
+            color: #01393b;
             font-weight: bold;
-            margin-top: 2rem;
+            margin-top: 80px;
             text-align: center;
         }
 
         form {
-            background: linear-gradient(135deg, #4caf50 0%, #1a1a2e 100%);
+            background: linear-gradient(135deg, #47696b 0%, #01393b 100%);
             border-radius: 10px;
             padding: 2rem;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -74,8 +126,8 @@
             margin-top: 2rem;
             padding: 1rem;
             border-radius: 10px;
-            background-color: #333;
-            color: #4caf50;
+            background-color: rgba(3, 47, 58, 0.8);
+            color: white;
             font-size: 1.2rem;
             clear: both;
         }
@@ -141,37 +193,120 @@
             color: #bbb;
             text-decoration: none;
         }
+
+        /* Footer Section */
+        .copyright {
+            text-align: center;
+            padding: 20px 0;
+            margin-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+        }
+
+        /* Estilo para la barra de scroll */
+        ::-webkit-scrollbar {
+            width: 10px; /* Ancho de la barra */
+            height: 10px; /* Alto de la barra para desplazamientos horizontales */
+        }
+
+        /* Estilo para el track (fondo del scroll) */
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1); /* Fondo translúcido */
+            border-radius: 10px;
+        }
+
+        /* Estilo para el pulgar (thumb) */
+        ::-webkit-scrollbar-thumb {
+            background: #064148; /* Color del pulgar */
+            border-radius: 10px; /* Bordes redondeados */
+            border: 2px solid #099992; /* Borde alrededor del pulgar */
+        }
+
+        /* Hover sobre el pulgar */
+        ::-webkit-scrollbar-thumb:hover {
+            background: #01393b; /* Cambia de color al pasar el mouse */
+        }
     </style>
 </head>
 
 <body>
-    <h1>Predicción de Tsunamis - JR48</h1>
-    <form id="predict-form">
-        <label>Año:
-            <input type="number" class="form-control" name="year">
-        </label>
-        <label>Latitud:
-            <input type="number" step="0.01" class="form-control" name="latitude">
-        </label>
-        <label>Longitud:
-            <input type="number" step="0.01" class="form-control" name="longitude">
-        </label>
-        <label>Magnitud:
-            <input type="number" step="0.1" class="form-control" name="magnitude">
-        </label>
-        <button type="button" class="btn btn-success w-100 mt-3" onclick="makePrediction()">Predecir</button>
-    </form>
-    <div id="map"></div>
-    <div id="result"></div>
-    <div class="tree-visualization mt-5">
-        <h2 class="text-center text-light">Visualización del Árbol de Decisión</h2>
-        <img src="/static/arbol.png" alt="Árbol de Decisión" class="img-fluid rounded shadow mt-3 zoom"
-            onclick="openModal(this.src)">
+    <nav class="navbar navbar-light fixed-top navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="/index.html">ProtoCool OS</a>
+    
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarOpen">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+    
+            <div class="collapse navbar-collapse" id="navbarOpen">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="http://127.0.0.1:5000/">JR48</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/templates/cluster.html">Clustering</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/templates/redneuronal.html">Red Neuronal</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/templates/Contacto/indexContacto.html">Contacto</a>
+                    </li>
+                </ul>
+            </div>
+    
+        </div>
+    </nav>
+    
+    <div class="main">
+        <h1>Predicción de Tsunamis - JR48</h1>
+        <form id="predict-form">
+            <label>Año:
+                <input type="number" class="form-control" name="year">
+            </label>
+            <label>Latitud:
+                <input type="number" step="0.01" class="form-control" name="latitude">
+            </label>
+            <label>Longitud:
+                <input type="number" step="0.01" class="form-control" name="longitude">
+            </label>
+            <label>Magnitud:
+                <input type="number" step="0.1" class="form-control" name="magnitude">
+            </label>
+            <button type="button" class="btn btn-success w-100 mt-3" onclick="makePrediction()">Predecir</button>
+        </form>
+        <div id="map"></div>
+        <div id="result"></div>
+        <div class="tree-visualization mt-5">
+            <h2 class="text-center text-light">Visualización del Árbol de Decisión</h2>
+            <img src="/static/arbol.png" alt="Árbol de Decisión" class="img-fluid rounded shadow mt-3 zoom"
+                onclick="openModal(this.src)">
+        </div>
+        <div id="imageModal" class="modal">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <img class="modal-content" id="modalImage">
+        </div>
     </div>
-    <div id="imageModal" class="modal">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <img class="modal-content" id="modalImage">
+
+    <div class="copyright">
+        <p>Copyright 2024, ProtoCool OS</p>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js"></script>
+    <script>
+        // Espera a que el DOM cargue completamente
+        document.addEventListener('DOMContentLoaded', function () {
+            const navbar = document.querySelector('.navbar');
+            window.addEventListener('scroll', function () {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+        });
+    </script>  
     <!-- Leaflet.js JavaScript -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
@@ -233,36 +368,33 @@
         let startX, startY; // Posición inicial del clic
 
         function openModal(imageSrc) {
-    const modal = document.getElementById('imageModal');
-    const modalImage = document.getElementById('modalImage');
+            const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
 
-    // Muestra el modal
-    modal.style.display = "block";
-    modalImage.src = imageSrc;
+            // Muestra el modal
+            modal.style.display = "block";
+            modalImage.src = imageSrc;
 
-    // Esperar a que la imagen se cargue completamente antes de obtener sus dimensiones
-    modalImage.onload = function () {
-        // Obtener las dimensiones de la imagen y del modal
-        const imageWidth = modalImage.naturalWidth;
-        const imageHeight = modalImage.naturalHeight;
-        const modalWidth = modal.offsetWidth;
-        const modalHeight = modal.offsetHeight;
+            // Esperar a que la imagen se cargue completamente antes de obtener sus dimensiones
+            modalImage.onload = function () {
+                // Obtener las dimensiones de la imagen y del modal
+                const imageWidth = modalImage.naturalWidth;
+                const imageHeight = modalImage.naturalHeight;
+                const modalWidth = modal.offsetWidth;
+                const modalHeight = modal.offsetHeight;
 
-        // Calcular las posiciones para centrar la imagen
-        const centerX = (modalWidth - imageWidth) / 2;
-        const centerY = (modalHeight - imageHeight) / 2;
+                // Calcular las posiciones para centrar la imagen
+                const centerX = (modalWidth - imageWidth) / 2;
+                const centerY = (modalHeight - imageHeight) / 2;
 
-        // Establecer la transformación inicial para centrar la imagen
-        modalImage.style.transform = `scale(${scale}) translate(${centerX}px, ${centerY}px)`;
-        translateX = centerX; // Ajustamos la posición de inicio
-        translateY = centerY;
-    };
+                // Establecer la transformación inicial para centrar la imagen
+                modalImage.style.transform = `scale(${scale}) translate(${centerX}px, ${centerY}px)`;
+                translateX = centerX; // Ajustamos la posición de inicio
+                translateY = centerY;
+            };
 
-    resetZoom(); // Restablecer el zoom y la posición
-}
-
-
-
+            resetZoom(); // Restablecer el zoom y la posición
+        }
 
         function closeModal() {
             const modal = document.getElementById('imageModal');
@@ -301,17 +433,17 @@
             document.body.style.cursor = "grabbing";
         }
 
-      function dragImage(event) {
-    if (!isDragging) return;
-    event.preventDefault();
-    
-    // Calcula la nueva posición sin desbordar fuera del modal
-    translateX = event.clientX - startX;
-    translateY = event.clientY - startY;
+        function dragImage(event) {
+            if (!isDragging) return;
+            event.preventDefault();
+            
+            // Calcula la nueva posición sin desbordar fuera del modal
+            translateX = event.clientX - startX;
+            translateY = event.clientY - startY;
 
-    const modalImage = document.getElementById('modalImage');
-    modalImage.style.transform = `scale(${scale}) translate(${translateX}px, ${translateY}px)`;
-}
+            const modalImage = document.getElementById('modalImage');
+            modalImage.style.transform = `scale(${scale}) translate(${translateX}px, ${translateY}px)`;
+        }
 
 
         function stopDrag() {
